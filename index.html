@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Razz-Bar Boutique</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#090b12;
+  color:white;
+}
+header{
+  padding:22px 16px;
+  text-align:center;
+  background:linear-gradient(135deg,#171b2b,#0b0d14);
+  border-bottom:1px solid #292d3a;
+}
+header h1{margin:0;font-size:30px}
+header p{color:#aaa;margin:8px 0 0}
+
+.container{max-width:900px;margin:auto;padding:20px}
+
+.products{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+.product{
+  background:#151923;
+  border:1px solid #292e3c;
+  border-radius:16px;
+  padding:12px;
+}
+.product .visual{
+  height:170px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#20263a,#11141d);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:15px;
+  font-size:18px;
+  font-weight:bold;
+}
+.product h3{margin:12px 0 5px}
+.price{font-size:19px;font-weight:bold}
+.product button,.checkout button{
+  width:100%;
+  border:0;
+  border-radius:10px;
+  padding:13px;
+  margin-top:10px;
+  background:#7c3cff;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+}
+
+.offer{
+  margin:20px 0;
+  padding:18px;
+  text-align:center;
+  border-radius:15px;
+  background:linear-gradient(135deg,#7c3cff,#e43cff);
+}
+.offer strong{font-size:22px}
+
+.cart{
+  margin-top:25px;
+  background:#151923;
+  border:1px solid #292e3c;
+  border-radius:16px;
+  padding:18px;
+}
+.cart h2{margin-top:0}
+.cart-item{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid #292e3c;
+}
+.total{
+  display:flex;
+  justify-content:space-between;
+  font-size:21px;
+  font-weight:bold;
+  margin-top:15px;
+}
+
+.checkout{
+  margin-top:20px;
+  background:#10131b;
+  border-radius:16px;
+  padding:18px;
+}
+.checkout h2{margin-top:0}
+label{display:block;margin-top:12px;margin-bottom:5px;color:#ccc}
+input,select,textarea{
+  width:100%;
+  padding:13px;
+  border-radius:9px;
+  border:1px solid #363b49;
+  background:#090b12;
+  color:white;
+  font-size:16px;
+}
+textarea{min-height:80px}
+
+.info{
+  margin-top:20px;
+  padding:16px;
+  background:#151923;
+  border-radius:14px;
+  color:#ccc;
+  line-height:1.5;
+}
+
+@media(max-width:600px){
+  .products{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>RAZZ-BAR</h1>
+  <p>Boutique de boissons</p>
+</header>
+
+<div class="container">
+
+  <div class="offer">
+    <strong>20 € l'unité</strong><br>
+    Offre : <strong>3 boissons = 55 €</strong>
+  </div>
+
+  <div class="products" id="products"></div>
+
+  <div class="cart">
+    <h2>🛒 Votre panier</h2>
+    <div id="cart"></div>
+    <div class="total">
+      <span>Total</span>
+      <span id="total">0 €</span>
+    </div>
+  </div>
+
+  <div class="checkout">
+    <h2>📦 Finaliser la commande</h2>
+
+    <label>Nom et prénom</label>
+    <input id="name" type="text" placeholder="Votre nom">
+
+    <label>Adresse précise</label>
+    <textarea id="address" placeholder="Numéro, rue, bâtiment..."></textarea>
+
+    <label>Code postal</label>
+    <input id="postal" type="text" placeholder="Ex : 01000">
+
+    <label>Ville</label>
+    <input id="city" type="text" placeholder="Mâcon, Bourg-en-Bresse...">
+
+    <label>Numéro de téléphone</label>
+    <input id="phone" type="tel" placeholder="Votre numéro">
+
+    <label>Code promo</label>
+    <input id="promo" type="text" placeholder="Facultatif">
+
+    <label>Mode de paiement</label>
+    <select id="payment">
+      <option value="">Choisir</option>
+      <option>Virement instantané</option>
+      <option>Espèces</option>
+    </select>
+
+    <button onclick="sendOrder()">Valider la commande</button>
+  </div>
+
+  <div class="info">
+    🚚 Livraison disponible sur <strong>Mâcon</strong>, <strong>Bourg-en-Bresse</strong>
+    et leurs alentours.<br>
+    Les frais de livraison dans les alentours sont calculés par l'administrateur
+    lors de la prise de commande.
+  </div>
+
+</div>
+
+<script>
+const products = [
+  "Love 66",
+  "Black Ice Dragon Fruit Strawberry",
+  "Coco Loco",
+  "Lemon Peach Passion Fruit",
+  "Lemon Lime",
+  "Tropical Fruit",
+  "Strawberry Banana",
+  "Gummy Bear",
+  "Strawberry Kiwi"
+];
+
+let cart = [];
+
+const productsDiv = document.getElementById("products");
+
+products.forEach((name, index) => {
+  productsDiv.innerHTML += `
+    <div class="product">
+      <div class="visual">${name}</div>
+      <h3>${name}</h3>
+      <div class="price">20 €</div>
+      <button onclick="addToCart(${index})">Ajouter au panier</button>
+    </div>
+  `;
+});
+
+function addToCart(index){
+  cart.push(products[index]);
+  updateCart();
+}
+
+function updateCart(){
+  const cartDiv = document.getElementById("cart");
+
+  if(cart.length === 0){
+    cartDiv.innerHTML = "<p>Votre panier est vide.</p>";
+  } else {
+    cartDiv.innerHTML = cart.map((item,i)=>`
+      <div class="cart-item">
+        <span>${item}</span>
+        <button onclick="removeItem(${i})"
+        style="width:auto;margin:0;padding:6px 10px;background:#d93636">
+        ✕
+        </button>
+      </div>
+    `).join("");
+  }
+
+  let total = cart.length >= 3
+    ? Math.floor(cart.length / 3) * 55 + (cart.length % 3) * 20
+    : cart.length * 20;
+
+  document.getElementById("total").textContent = total + " €";
+}
+
+function removeItem(index){
+  cart.splice(index,1);
+  updateCart();
+}
+
+function sendOrder(){
+
+  if(cart.length === 0){
+    alert("Votre panier est vide.");
+    return;
+  }
+
+  const name = document.getElementById("name").value.trim();
+  const address = document.getElementById("address").value.trim();
+  const postal = document.getElementById("postal").value.trim();
+  const city = document.getElementById("city").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const payment = document.getElementById("payment").value;
+
+  if(!name || !address || !postal || !city || !phone || !payment){
+    alert("Merci de remplir toutes les informations demandées.");
+    return;
+  }
+
+  let total = cart.length >= 3
+    ? Math.floor(cart.length / 3) * 55 + (cart.length % 3) * 20
+    : cart.length * 20;
+
+  alert(
+    "Commande enregistrée !\n\n" +
+    "Client : " + name + "\n" +
+    "Ville : " + city + "\n" +
+    "Téléphone : " + phone + "\n\n" +
+    "Articles : " + cart.join(", ") + "\n" +
+    "Total produits : " + total + " €\n" +
+    "Paiement : " + payment +
+    "\n\nLes frais de livraison seront calculés par l'administrateur."
+  );
+}
+</script>
+
+</body>
+</html>
